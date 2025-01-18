@@ -55,7 +55,6 @@ const Register = ({ setIsAuthenticated }) => {
     setLoading(true);
     setError('');
 
-    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       setLoading(false);
