@@ -31,7 +31,7 @@ router.post('/login', async (req, res) => {
             user: {
                 username: user.username,
                 id: user._id,
-                phoneNumber: user.phoneNumber // Add this to help with password reset
+                phoneNumber: user.phoneNumber 
             }
         });
 
@@ -65,22 +65,18 @@ router.post('/reset-password', async (req, res) => {
     try {
       const { username, newPassword } = req.body;
   
-      // Validate input
       if (!username || !newPassword) {
         return res.status(400).json({ message: 'All fields are required' });
       }
   
-      // Find user
       const user = await User.findOne({ username });
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
   
-      // Hash new password
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(newPassword, salt);
   
-      // Update password
       user.password = hashedPassword;
       await user.save();
   
@@ -94,17 +90,14 @@ router.post('/register', async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        // Check if user already exists
         const existingUser = await User.findOne({ username });
         if (existingUser) {
             return res.status(400).json({ error: 'Username already exists' });
         }
 
-        // Hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Create new user
         const user = new User({
             username,
             password: hashedPassword
@@ -112,7 +105,6 @@ router.post('/register', async (req, res) => {
 
         await user.save();
 
-        // Generate token
         const token = jwt.sign(
             { userId: user._id, username: user.username },
             process.env.TOKEN_KEY,
