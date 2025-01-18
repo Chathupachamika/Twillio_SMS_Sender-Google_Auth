@@ -161,7 +161,7 @@ const Login = ({ setIsAuthenticated }) => {
     }
     setLoading(true);
     try {
-      await axios.post('http://localhost:3003/api/verification/send-code', {
+      await axios.post('http://localhost:3003/api/verification/send-otp', {
         phoneNumber: resetData.phoneNumber,
         channel: 'sms'
       });
@@ -179,18 +179,30 @@ const Login = ({ setIsAuthenticated }) => {
       setError('Please enter the OTP');
       return;
     }
+    
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:3003/api/verification/verify-code', {
+      const response = await axios.post('http://localhost:3003/api/verification/verify-otp', {
         phoneNumber: resetData.phoneNumber,
         code: resetData.otp
       });
-      if (response.data.result.status === 'approved') {
+
+      // Backend returns { success: true, message: 'OTP verified successfully' }
+      if (response.data.success) {
         setActiveStep(2);
         setError('');
+      } else {
+        setError('Invalid OTP');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid OTP.');
+      // Handle different types of errors
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.response?.status === 400) {
+        setError('Invalid OTP');
+      } else {
+        setError('Failed to verify OTP. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

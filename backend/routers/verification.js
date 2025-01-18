@@ -1,29 +1,50 @@
 const express = require('express');
-const { sendVerificationCode, verifyCode } = require('../services/twilioService');
-
 const router = express.Router();
+const TwilioService = require('../services/twilioService');
 
-router.post('/send-code', async (req, res) => {
-    const { phoneNumber, channel } = req.body;
+router.post('/send-otp', async (req, res) => {
     try {
-        const result = await sendVerificationCode(phoneNumber, channel);
-        res.status(200).json({ message: 'Verification code sent', sid: result.sid });
+        const { phoneNumber } = req.body;
+        const twilioService = new TwilioService();
+        const verification = await twilioService.sendOTP(phoneNumber);
+        
+        res.json({
+            success: true,
+            message: 'OTP sent successfully',
+            verificationSid: verification.sid
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to send OTP',
+            error: error.message
+        });
     }
 });
 
-router.post('/verify-code', async (req, res) => {
-    const { phoneNumber, code } = req.body;
+router.post('/verify-otp', async (req, res) => {
     try {
-        const result = await verifyCode(phoneNumber, code);
-        if (result.status === 'approved') {
-            res.status(200).json({ message: 'Verification successful', result });
+        const { phoneNumber, code } = req.body;
+        const twilioService = new TwilioService();
+        const verification = await twilioService.verifyOTP(phoneNumber, code);
+        
+        if (verification.status === 'approved') {
+            res.json({
+                success: true,
+                message: 'OTP verified successfully'
+            });
         } else {
-            res.status(400).json({ message: 'Verification failed', result });
+            res.status(400).json({
+                success: false,
+                message: 'Invalid OTP'
+            });
         }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to verify OTP',
+            error: error.message
+        });
     }
 });
 

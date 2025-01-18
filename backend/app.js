@@ -3,6 +3,7 @@ const express = require('express');
 const connectDB = require('./db');
 const cors = require('cors');
 const passport = require('passport');
+const verificationRouter = require('./routers/verification');
 const session = require('express-session');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('./models/user');
@@ -95,13 +96,12 @@ app.get('/auth/google/callback',
 // Import routes
 const userRoutes = require('./routers/user');
 const studentRoutes = require('./routers/student');
-const verificationRoutes = require('./routers/verification');
 const auth = require('./middleware/auth');
 
 // Route middlewares
 app.use('/api/user', userRoutes);
 app.use('/api/student', auth, studentRoutes);
-app.use('/api/verification', verificationRoutes);
+app.use('/api/verification', verificationRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
