@@ -7,13 +7,10 @@ const verificationRouter = require('./routers/verification');
 const session = require('express-session');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('./models/user');
-// Initialize express app
 const app = express();
 
-// Connect to MongoDB
 connectDB();
 
-// Middleware
 app.use(cors({
     origin: process.env.CLIENT_URL,
     credentials: true
@@ -37,7 +34,6 @@ passport.use(new GoogleStrategy({
         let user = await User.findOne({ googleId: profile.id });
         
         if (!user) {
-            // Create new user if doesn't exist
             user = await User.create({
                 username: profile.displayName,
                 email: profile.emails[0].value,
@@ -65,7 +61,6 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-// Google OAuth routes
 app.get('/auth/google',
     passport.authenticate('google', { scope: ['profile', 'email'] })
 );
@@ -85,7 +80,6 @@ app.get('/auth/google/callback',
           { expiresIn: '24h' }
         );
         
-        // Use absolute URL for redirect
         res.redirect(`${process.env.CLIENT_URL}/auth-callback?token=${token}`);
       } catch (error) {
         res.redirect(`${process.env.CLIENT_URL}/login?error=authentication_failed`);
@@ -93,17 +87,14 @@ app.get('/auth/google/callback',
     }
   );
 
-// Import routes
 const userRoutes = require('./routers/user');
 const studentRoutes = require('./routers/student');
 const auth = require('./middleware/auth');
 
-// Route middlewares
 app.use('/api/user', userRoutes);
 app.use('/api/student', auth, studentRoutes);
 app.use('/api/verification', verificationRouter);
 
-// Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
@@ -113,7 +104,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Handle 404 routes
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -121,20 +111,17 @@ app.use((req, res) => {
     });
 });
 
-// Server setup
 const port = process.env.PORT || 3003;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
-// Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
     console.log('UNHANDLED REJECTION! 💥 Shutting down...');
     console.log(err.name, err.message);
     process.exit(1);
 });
 
-// Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
     console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
     console.log(err.name, err.message);
