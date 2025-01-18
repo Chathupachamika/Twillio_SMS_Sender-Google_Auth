@@ -37,7 +37,6 @@ import {
   Google as GoogleIcon,
 } from '@mui/icons-material';
 
-// Existing styled components remain the same
 const StyledContainer = styled('div')({
   display: 'flex',
   flexDirection: 'column',
@@ -75,7 +74,6 @@ const StyledButton = styled(Button)(({ theme }) => ({
   fontWeight: 600,
 }));
 
-// New styled component for Google button
 const GoogleButton = styled(Button)(({ theme }) => ({
   backgroundColor: '#ffffff',
   color: theme.palette.text.primary,
@@ -187,7 +185,6 @@ const Login = ({ setIsAuthenticated }) => {
         code: resetData.otp
       });
 
-      // Backend returns { success: true, message: 'OTP verified successfully' }
       if (response.data.success) {
         setActiveStep(2);
         setError('');
@@ -195,7 +192,6 @@ const Login = ({ setIsAuthenticated }) => {
         setError('Invalid OTP');
       }
     } catch (err) {
-      // Handle different types of errors
       if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else if (err.response?.status === 400) {
@@ -348,8 +344,6 @@ const Login = ({ setIsAuthenticated }) => {
       newPassword: '',
     });
   };
-
-  // ... keep existing return statement until Dialog ...
 
   return (
      <StyledContainer>
